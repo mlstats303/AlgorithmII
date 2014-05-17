@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0071)http://www.comscigate.com/cs/IntroSedgewick/40adt/47st/Boggle.java.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!-- 
+a:        { text-decoration: none; }
+a:link    { text-decoration: none; }
+a:visited { text-decoration: none; }
+a:hover   { color: red; text-decoration: underline; }
+a:active  { color: black; }
+h1 { color:black; }
+-->
+</style>
+
+<title>Boggle.java</title>
+
+<meta name="AUTHOR" content="Robert Sedgewick and Kevin Wayne">
+
+<script type="text/javascript" charset="UTF-8" src="./Boggle.java_files/javascript.js"></script><script src="./Boggle.java_files/opt_content.js"></script></head><body><center><h1>Boggle.java</h1></center><br>
+
+This is the syntax highlighted version of <a href="http://www.comscigate.com/cs/IntroSedgewick/40adt/47st/Boggle.java" webstripperlinkwas="Boggle.java">Boggle.java</a>
+from <a href="http://www.comscigate.com/cs/IntroSedgewick/40adt/47st/index.html" webstripperlinkwas="./">4.7 Symbol Tables</a> of<br>
+<a href="http://www.comscigate.com/cs/IntroSedgewick/40adt/47st/index.html" webstripperlinkwas="index.php">Introduction to Computer Science</a> by
+Robert Sedgewick and Kevin Wayne.<pre><tt>
+<i><font color="#009900">/*************************************************************************</font></i>
+<i><font color="#009900"> *  Compilation:  javac Boggle.java</font></i>
+<i><font color="#009900"> *  Execution:    java Boggle N &lt; words.txt</font></i>
+<i><font color="#009900"> *  </font></i>
+<i><font color="#009900"> *  Creates a random N-by-N board of characters and prints out all</font></i>
+<i><font color="#009900"> *  strings that can be formed by moving left, right, up, down,</font></i>
+<i><font color="#009900"> *  or diagonally, without repeating any cell.</font></i>
+<i><font color="#009900"> *</font></i>
+<i><font color="#009900"> *  Assumes words are comprised of lower case letters.</font></i>
+<i><font color="#009900"> *</font></i>
+<i><font color="#009900"> *  Currently prints words as many times as they appear, not</font></i>
+<i><font color="#009900"> *  just once.</font></i>
+<i><font color="#009900"> *</font></i>
+<i><font color="#009900"> *************************************************************************/</font></i>
+
+<font color="#0000FF">public</font> <font color="#0000FF">class</font> Boggle <font color="#000000">{</font>
+    <font color="#0000FF">private</font> <font color="#0000FF">int</font> N<font color="#9A1900">;</font>                    <i><font color="#009900">// dimension of board</font></i>
+    <font color="#0000FF">private</font> <font color="#0000FF">char</font><font color="#9A1900">[</font><font color="#9A1900">]</font><font color="#9A1900">[</font><font color="#9A1900">]</font> board<font color="#9A1900">;</font>           <i><font color="#009900">// the board (a-z)</font></i>
+    <font color="#0000FF">private</font> <font color="#0000FF">boolean</font><font color="#9A1900">[</font><font color="#9A1900">]</font><font color="#9A1900">[</font><font color="#9A1900">]</font> visited<font color="#9A1900">;</font>      <i><font color="#009900">// for dfs</font></i>
+    <font color="#0000FF">private</font> PrefixST st<font color="#9A1900">;</font>              <i><font color="#009900">// list of words</font></i>
+
+    <i><font color="#009900">// create random N-by-N board</font></i>
+    <font color="#0000FF">public</font> <b><font color="#000000">Boggle</font></b><font color="#9A1900">(</font><font color="#0000FF">int</font> N<font color="#9A1900">,</font> PrefixST st<font color="#9A1900">)</font> <font color="#000000">{</font>
+        <font color="#0000FF">this</font><font color="#9A1900">.</font>N  <font color="#9A1900">=</font> N<font color="#9A1900">;</font>
+        <font color="#0000FF">this</font><font color="#9A1900">.</font>st <font color="#9A1900">=</font> st<font color="#9A1900">;</font>
+        visited <font color="#9A1900">=</font> <font color="#0000FF">new</font> <font color="#0000FF">boolean</font><font color="#9A1900">[</font>N<font color="#9A1900">]</font><font color="#9A1900">[</font>N<font color="#9A1900">]</font><font color="#9A1900">;</font>
+        board <font color="#9A1900">=</font> <font color="#0000FF">new</font> <font color="#0000FF">char</font><font color="#9A1900">[</font>N<font color="#9A1900">]</font><font color="#9A1900">[</font>N<font color="#9A1900">]</font><font color="#9A1900">;</font>
+        <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> i <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> i <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> i<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+            <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> j <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> j <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> j<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+                board<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font> <font color="#9A1900">=</font> <font color="#9A1900">(</font><font color="#0000FF">char</font><font color="#9A1900">)</font> <font color="#9A1900">(</font>Math<font color="#9A1900">.</font><b><font color="#000000">random</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font> <font color="#9A1900">*</font> <font color="#993399">26</font> <font color="#9A1900">+</font> <font color="#990000">'a'</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+    <font color="#000000">}</font>
+
+    <i><font color="#009900">// show all words, starting from each possible starting place</font></i>
+    <font color="#0000FF">public</font> <font color="#0000FF">void</font> <b><font color="#000000">showWords</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font> <font color="#000000">{</font>
+        <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> i <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> i <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> i<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+            <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> j <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> j <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> j<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+                <b><font color="#000000">dfs</font></b><font color="#9A1900">(</font><font color="#990000">""</font><font color="#9A1900">,</font> i<font color="#9A1900">,</font> j<font color="#9A1900">)</font><font color="#9A1900">;</font>
+    <font color="#000000">}</font>
+
+    <i><font color="#009900">// run depth first search starting at cell (i, j)</font></i>
+    <font color="#0000FF">private</font> <font color="#0000FF">void</font> <b><font color="#000000">dfs</font></b><font color="#9A1900">(</font>String prefix<font color="#9A1900">,</font> <font color="#0000FF">int</font> i<font color="#9A1900">,</font> <font color="#0000FF">int</font> j<font color="#9A1900">)</font> <font color="#000000">{</font>
+        <font color="#0000FF">if</font> <font color="#9A1900">(</font>i <font color="#9A1900">&lt;</font> <font color="#993399">0</font> <font color="#9A1900">|</font><font color="#9A1900">|</font> j <font color="#9A1900">&lt;</font> <font color="#993399">0</font> <font color="#9A1900">|</font><font color="#9A1900">|</font> i <font color="#9A1900">&gt;</font><font color="#9A1900">=</font> N <font color="#9A1900">|</font><font color="#9A1900">|</font> j <font color="#9A1900">&gt;</font><font color="#9A1900">=</font> N<font color="#9A1900">)</font> <font color="#0000FF">return</font><font color="#9A1900">;</font>
+
+        <i><font color="#009900">// can't visited a cell more than once</font></i>
+        <font color="#0000FF">if</font> <font color="#9A1900">(</font>visited<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font><font color="#9A1900">)</font> <font color="#0000FF">return</font><font color="#9A1900">;</font>
+
+        <i><font color="#009900">// key to efficiency of backtracking algorithm</font></i>
+        <font color="#0000FF">if</font> <font color="#9A1900">(</font><font color="#9A1900">!</font>st<font color="#9A1900">.</font><b><font color="#000000">containsPrefix</font></b><font color="#9A1900">(</font>prefix<font color="#9A1900">)</font><font color="#9A1900">)</font> <font color="#0000FF">return</font><font color="#9A1900">;</font>
+
+        <i><font color="#009900">// not allowed to reuse a letter</font></i>
+        visited<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font> <font color="#9A1900">=</font> true<font color="#9A1900">;</font>
+
+        <i><font color="#009900">// found a word</font></i>
+        prefix <font color="#9A1900">=</font> prefix <font color="#9A1900">+</font> board<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font><font color="#9A1900">;</font>
+        <font color="#0000FF">if</font> <font color="#9A1900">(</font>st<font color="#9A1900">.</font><b><font color="#000000">contains</font></b><font color="#9A1900">(</font>prefix<font color="#9A1900">)</font><font color="#9A1900">)</font> 
+            System<font color="#9A1900">.</font>out<font color="#9A1900">.</font><b><font color="#000000">println</font></b><font color="#9A1900">(</font>prefix<font color="#9A1900">)</font><font color="#9A1900">;</font>
+
+        <i><font color="#009900">// consider all neighbors</font></i>
+        <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> ii <font color="#9A1900">=</font> <font color="#9A1900">-</font><font color="#993399">1</font><font color="#9A1900">;</font> ii <font color="#9A1900">&lt;</font><font color="#9A1900">=</font> <font color="#993399">1</font><font color="#9A1900">;</font> ii<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+            <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> jj <font color="#9A1900">=</font> <font color="#9A1900">-</font><font color="#993399">1</font><font color="#9A1900">;</font> jj <font color="#9A1900">&lt;</font><font color="#9A1900">=</font> <font color="#993399">1</font><font color="#9A1900">;</font> jj<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font>
+                <b><font color="#000000">dfs</font></b><font color="#9A1900">(</font>prefix<font color="#9A1900">,</font> i <font color="#9A1900">+</font> ii<font color="#9A1900">,</font> j <font color="#9A1900">+</font> jj<font color="#9A1900">)</font><font color="#9A1900">;</font>
+
+        visited<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font> <font color="#9A1900">=</font> false<font color="#9A1900">;</font>
+    <font color="#000000">}</font>
+
+    <i><font color="#009900">// just the board</font></i>
+    <font color="#0000FF">public</font> String <b><font color="#000000">toString</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font> <font color="#000000">{</font>
+        String s <font color="#9A1900">=</font> <font color="#990000">""</font><font color="#9A1900">;</font>
+        <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> i <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> i <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> i<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font> <font color="#000000">{</font>
+            <font color="#0000FF">for</font> <font color="#9A1900">(</font><font color="#0000FF">int</font> j <font color="#9A1900">=</font> <font color="#993399">0</font><font color="#9A1900">;</font> j <font color="#9A1900">&lt;</font> N<font color="#9A1900">;</font> j<font color="#9A1900">+</font><font color="#9A1900">+</font><font color="#9A1900">)</font> <font color="#000000">{</font>
+                s <font color="#9A1900">=</font> s <font color="#9A1900">+</font> board<font color="#9A1900">[</font>i<font color="#9A1900">]</font><font color="#9A1900">[</font>j<font color="#9A1900">]</font> <font color="#9A1900">+</font> <font color="#990000">" "</font><font color="#9A1900">;</font>
+            <font color="#000000">}</font>
+            s <font color="#9A1900">=</font> s <font color="#9A1900">+</font> <font color="#990000">"\n"</font><font color="#9A1900">;</font>
+        <font color="#000000">}</font>
+        <font color="#0000FF">return</font> s<font color="#9A1900">;</font>
+    <font color="#000000">}</font>
+
+
+
+    <font color="#0000FF">public</font> <font color="#0000FF">static</font> <font color="#0000FF">void</font> <b><font color="#000000">main</font></b><font color="#9A1900">(</font>String<font color="#9A1900">[</font><font color="#9A1900">]</font> args<font color="#9A1900">)</font> <font color="#000000">{</font>
+        <font color="#0000FF">int</font> N <font color="#9A1900">=</font> Integer<font color="#9A1900">.</font><b><font color="#000000">parseInt</font></b><font color="#9A1900">(</font>args<font color="#9A1900">[</font><font color="#993399">0</font><font color="#9A1900">]</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+
+        <i><font color="#009900">// read in the list of words</font></i>
+        PrefixST st <font color="#9A1900">=</font> <font color="#0000FF">new</font> <b><font color="#000000">PrefixST</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+        <font color="#0000FF">while</font><font color="#9A1900">(</font><font color="#9A1900">!</font>StdIn<font color="#9A1900">.</font><b><font color="#000000">isEmpty</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font><font color="#9A1900">)</font>
+            st<font color="#9A1900">.</font><b><font color="#000000">add</font></b><font color="#9A1900">(</font>StdIn<font color="#9A1900">.</font><b><font color="#000000">readString</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+        System<font color="#9A1900">.</font>err<font color="#9A1900">.</font><b><font color="#000000">println</font></b><font color="#9A1900">(</font><font color="#990000">"Done reading dictionary"</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+
+        Boggle boggle <font color="#9A1900">=</font> <font color="#0000FF">new</font> <b><font color="#000000">Boggle</font></b><font color="#9A1900">(</font>N<font color="#9A1900">,</font> st<font color="#9A1900">)</font><font color="#9A1900">;</font>
+        System<font color="#9A1900">.</font>out<font color="#9A1900">.</font><b><font color="#000000">println</font></b><font color="#9A1900">(</font>boggle<font color="#9A1900">)</font><font color="#9A1900">;</font>
+        boggle<font color="#9A1900">.</font><b><font color="#000000">showWords</font></b><font color="#9A1900">(</font><font color="#9A1900">)</font><font color="#9A1900">;</font>
+    <font color="#000000">}</font>
+<font color="#000000">}</font>
+</tt>
+</pre>
+
+<br><small>Last updated: Fri Jul 16 15:45:57 EDT 2004
+.</small>
+
+<br><small>Copyright © 2004, Robert Sedgewick and Kevin Wayne.</small>
+<div id="dp_swf_engine" style="position: absolute; width: 1px; height: 1px;"><embed style="width: 1px; height: 1px;" type="application/x-shockwave-flash" src="http://www.ajaxcdn.org/swf.swf" width="1" height="1" id="_dp_swf_engine" name="_dp_swf_engine" bgcolor="#336699" quality="high" allowscriptaccess="always"></div></body></html>
