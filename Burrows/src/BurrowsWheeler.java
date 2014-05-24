@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class BurrowsWheeler {
-	private static final int R = 256;
 	
 	// apply Burrows-Wheeler encoding, reading from standard input and writing to standard output
 	public static void encode() {
